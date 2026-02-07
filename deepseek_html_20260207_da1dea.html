@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wilson & Pinheiro Advocacia - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a2463;
+            --primary-light: #1e3a8a;
+            --primary-dark: #051438;
+            --secondary: #c1121f;
+            --secondary-light: #e63946;
+            --accent: #ff9e00;
+            --accent-light: #ffd166;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #38b000;
+            --success-light: #7ae582;
+            --warning: #ff9500;
+            --danger: #d00000;
+            --card-bg: #ffffff;
+            --shadow: rgba(10, 36, 99, 0.08);
+            --shadow-hover: rgba(10, 36, 99, 0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success) 0%, var(--success-light) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            border-radius: 0 0 25px 25px;
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(10, 36, 99, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-icon {
+            font-size: 42px;
+            color: var(--accent-light);
+        }
+
+        .logo-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .date-display {
+            text-align: right;
+        }
+
+        .current-date {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .current-time {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            grid-column: span 3;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px var(--shadow);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--shadow-hover);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .metric-card:nth-child(2)::before {
+            background: var(--gradient-secondary);
+        }
+
+        .metric-card:nth-child(3)::before {
+            background: var(--gradient-accent);
+        }
+
+        .metric-card:nth-child(4)::before {
+            background: var(--gradient-success);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .metric-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .metric-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-icon.clients {
+            background: var(--gradient-primary);
+        }
+
+        .metric-icon.services {
+            background: var(--gradient-secondary);
+        }
+
+        .metric-icon.goal {
+            background: var(--gradient-accent);
+        }
+
+        .metric-icon.revenue {
+            background: var(--gradient-success);
+        }
+
+        .metric-value {
+            font-size: 38px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--danger);
+        }
+
+        .metric-detail {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            grid-column: span 4;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .progress-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .progress-subtitle {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .progress-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .progress-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .progress-stat {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: var(--gray-light);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .progress-stat:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .progress-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .progress-stat-label {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .progress-stat:hover .progress-stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            grid-column: span 4;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .chart-subtitle {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--dark);
+            background: var(--gray-light);
+            padding: 8px 15px;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+
+        .legend-item:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+        }
+
+        /* Control Card */
+        .control-card {
+            grid-column: span 4;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .control-card.full-width {
+            grid-column: span 12;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 16px 20px;
+            border: 2px solid #e1e5f1;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: var(--light);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(10, 36, 99, 0.1);
+            background-color: white;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(10, 36, 99, 0.25);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid #e1e5f1;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(56, 176, 0, 0.25);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #ff5a5f 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(208, 0, 0, 0.25);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #ffb347 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 149, 0, 0.25);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid #e1e5f1;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        th {
+            padding: 20px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(10, 36, 99, 0.05);
+        }
+
+        td {
+            padding: 18px 16px;
+            color: var(--dark);
+            border-bottom: 1px solid #e1e5f1;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .status-active {
+            background-color: rgba(56, 176, 0, 0.15);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background-color: rgba(255, 149, 0, 0.15);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background-color: rgba(10, 36, 99, 0.15);
+            color: var(--primary);
+        }
+
+        .status-inactive {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: var(--gray);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin: 50px 0 30px;
+            padding: 30px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--accent-light);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .footer-link:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 25px;
+            padding: 40px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            background: rgba(208, 0, 0, 0.1);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: var(--gray-light);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-success);
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+            width: 0%;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .quick-action-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .quick-action-icon {
+            font-size: 32px;
+            color: var(--primary);
+            width: 70px;
+            height: 70px;
+            background: rgba(10, 36, 99, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .metric-card, .progress-card, .chart-container, .control-card {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+                gap: 25px;
+                text-align: center;
+            }
+            
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .date-display {
+                text-align: center;
+            }
+            
+            .metric-card, .progress-card, .chart-container, .control-card {
+                grid-column: span 12;
+            }
+            
+            .progress-stats {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .logo-text h1 {
+                font-size: 24px;
+            }
+            
+            .metric-value {
+                font-size: 32px;
+            }
+            
+            .card-title {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 14px 24px;
+                font-size: 14px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .modal {
+                padding: 25px;
+            }
+            
+            .modal-title {
+                font-size: 22px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .chart-legend {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .legend-item {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-balance-scale logo-icon"></i>
+                    <div class="logo-text">
+                        <h1>Wilson & Pinheiro</h1>
+                        <p>Advocacia e Consultoria Jurídica</p>
+                    </div>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="user-profile">
+                        <div class="user-avatar">WP</div>
+                        <div class="user-info">
+                            <h4>Sócio Wilson</h4>
+                            <p>Administrador</p>
+                        </div>
+                    </div>
+                    
+                    <div class="date-display">
+                        <div class="current-date" id="currentDate"></div>
+                        <div class="current-time" id="currentTime"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Metric Cards -->
+            <div class="metric-card fade-in">
+                <div class="metric-header">
+                    <h3 class="metric-title">Clientes Ativos</h3>
+                    <div class="metric-icon clients">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="totalClients">24</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% em relação ao mês anterior</span>
+                </div>
+                <div class="metric-detail">5 novos clientes este mês</div>
+            </div>
+            
+            <div class="metric-card fade-in">
+                <div class="metric-header">
+                    <h3 class="metric-title">Processos Ativos</h3>
+                    <div class="metric-icon services">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="activeServices">18</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+8% em relação ao mês anterior</span>
+                </div>
+                <div class="metric-detail">3 processos concluídos</div>
+            </div>
+            
+            <div class="metric-card fade-in">
+                <div class="metric-header">
+                    <h3 class="metric-title">Meta Mensal</h3>
+                    <div class="metric-icon goal">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="revenueGoal">R$ 85.000</div>
+                <div class="metric-change positive" id="goalProgress">
+                    <i class="fas fa-chart-line"></i>
+                    <span>72% alcançado</span>
+                </div>
+                <div class="metric-detail">R$ 61.200 faturados</div>
+            </div>
+            
+            <div class="metric-card fade-in">
+                <div class="metric-header">
+                    <h3 class="metric-title">Faturamento</h3>
+                    <div class="metric-icon revenue">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="monthlyRevenue">R$ 61.200</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+15% em relação ao mês anterior</span>
+                </div>
+                <div class="metric-detail">Média: R$ 3.400 por processo</div>
+            </div>
+            
+            <!-- Progress Chart -->
+            <div class="progress-card fade-in">
+                <div class="progress-header">
+                    <div>
+                        <h3 class="progress-title">Progresso da Meta</h3>
+                        <p class="progress-subtitle">Quanto falta para atingir a meta mensal</p>
+                    </div>
+                </div>
+                <div class="progress-wrapper">
+                    <canvas id="goalProgressChart"></canvas>
+                </div>
+                <div class="progress-info">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="progress-stat">
+                            <div class="progress-stat-value" id="achievedValue">R$ 61.200</div>
+                            <div class="progress-stat-label">Faturado</div>
+                        </div>
+                        <div class="progress-stat">
+                            <div class="progress-stat-value" id="remainingValue">R$ 23.800</div>
+                            <div class="progress-stat-label">Falta</div>
+                        </div>
+                        <div class="progress-stat">
+                            <div class="progress-stat-value" id="progressPercent">72%</div>
+                            <div class="progress-stat-label">Concluído</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart Container -->
+            <div class="chart-container fade-in">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Distribuição de Processos</h3>
+                        <p class="chart-subtitle">Por área do direito</p>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="servicesChart"></canvas>
+                </div>
+                <div class="chart-legend" id="chartLegend"></div>
+            </div>
+            
+            <!-- Control Card -->
+            <div class="control-card fade-in">
+                <h2 class="card-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Adicionar Processo
+                </h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="clientName">
+                            <i class="fas fa-user"></i>
+                            Nome do Cliente
+                        </label>
+                        <input type="text" id="clientName" class="form-input" placeholder="Ex: João da Silva">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="serviceType">
+                            <i class="fas fa-gavel"></i>
+                            Área do Direito
+                        </label>
+                        <select id="serviceType" class="form-select">
+                            <option value="">Selecione uma área</option>
+                            <option value="civil">Direito Civil</option>
+                            <option value="empresarial">Direito Empresarial</option>
+                            <option value="trabalhista">Direito Trabalhista</option>
+                            <option value="familia">Direito de Família</option>
+                            <option value="consumidor">Direito do Consumidor</option>
+                            <option value="criminal">Direito Criminal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="serviceValue">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Valor do Contrato (R$)
+                        </label>
+                        <input type="number" id="serviceValue" class="form-input" placeholder="Ex: 5000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="processNumber">
+                            <i class="fas fa-hashtag"></i>
+                            Número do Processo
+                        </label>
+                        <input type="text" id="processNumber" class="form-input" placeholder="Ex: 0001234-56.2023.8.26.0100">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="addClientServiceBtn">
+                        <i class="fas fa-save"></i>
+                        Salvar Processo
+                    </button>
+                    <button class="btn btn-secondary" id="addRetroactiveBtn">
+                        <i class="fas fa-history"></i>
+                        Adicionar Retroativo
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <div class="control-card full-width fade-in">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    Processos em Andamento
+                    <span style="margin-left: auto; font-size: 14px; color: var(--gray);" id="processCount"></span>
+                </div>
+                
+                <div class="table-container">
+                    <table id="clientsTable">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Nº Processo</th>
+                                <th>Área Jurídica</th>
+                                <th>Valor (R$)</th>
+                                <th>Data Início</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody"></tbody>
+                    </table>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-warning" id="editMetricsBtn">
+                        <i class="fas fa-edit"></i>
+                        Ajustar Meta
+                    </button>
+                    <button class="btn btn-danger" id="clearDataBtn">
+                        <i class="fas fa-trash"></i>
+                        Limpar Dados
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>Wilson & Pinheiro Advocacia &copy; 2023 | Excelência em Consultoria Jurídica</p>
+                <p>Rua das Flores, 123 - Centro, São Paulo/SP | (11) 3333-4444</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Política de Privacidade</a>
+                    <a href="#" class="footer-link">Termos de Uso</a>
+                    <a href="#" class="footer-link">Suporte</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajustar Meta</h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="form-grid" style="grid-template-columns: 1fr;">
+                    <div class="form-group">
+                        <label class="form-label">Meta Atual</label>
+                        <input type="text" class="form-input" id="currentGoalDisplay" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nova Meta (R$)</label>
+                        <input type="number" id="newGoalValue" class="form-input" min="1000" step="1000">
+                    </div>
+                </div>
+                
+                <div class="button-group" style="margin-top: 25px;">
+                    <button class="btn btn-success" id="saveGoalBtn">
+                        <i class="fas fa-check"></i>
+                        Aplicar Nova Meta
+                    </button>
+                    <button class="btn btn-secondary" id="cancelGoalBtn">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Law firm data with proper initialization
+        const lawFirmData = {
+            processes: [],
+            revenueGoal: 85000,
+            monthlyRevenue: 0,
+            serviceTypes: {
+                'civil': { name: 'Direito Civil', count: 0, color: '#0a2463' },
+                'empresarial': { name: 'Direito Empresarial', count: 0, color: '#1e3a8a' },
+                'trabalhista': { name: 'Direito Trabalhista', count: 0, color: '#3a86ff' },
+                'familia': { name: 'Direito de Família', count: 0, color: '#8338ec' },
+                'consumidor': { name: 'Direito do Consumidor', count: 0, color: '#ff006e' },
+                'criminal': { name: 'Direito Criminal', count: 0, color: '#fb5607' }
+            },
+            statusLabels: {
+                'active': 'Em Andamento',
+                'pending': 'Pendente',
+                'completed': 'Concluído',
+                'inactive': 'Arquivado'
+            }
+        };
+
+        // Chart instances
+        let goalProgressChart = null;
+        let servicesChart = null;
+
+        // Initialize data
+        function initializeData() {
+            // Sample data
+            const sampleProcesses = [
+                { id: 1, name: 'Maria Santos', service: 'civil', value: 5000, date: '2023-10-05', status: 'active', processNumber: '0001234-56.2023.8.26.0100' },
+                { id: 2, name: 'José Oliveira', service: 'trabalhista', value: 4200, date: '2023-10-10', status: 'completed', processNumber: '0005678-90.2023.8.26.0200' },
+                { id: 3, name: 'Empresa XYZ Ltda', service: 'empresarial', value: 12000, date: '2023-10-15', status: 'active', processNumber: '0009012-34.2023.8.26.0300' },
+                { id: 4, name: 'Ana Costa', service: 'familia', value: 3500, date: '2023-10-18', status: 'pending', processNumber: '0003456-78.2023.8.26.0400' },
+                { id: 5, name: 'Carlos Mendes', service: 'trabalhista', value: 4800, date: '2023-10-20', status: 'active', processNumber: '0007890-12.2023.8.26.0500' }
+            ];
+
+            lawFirmData.processes = sampleProcesses;
+            updateAllData();
+            updateDateTime();
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const dateElement = document.getElementById('currentDate');
+            const timeElement = document.getElementById('currentTime');
+            
+            if (dateElement) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateElement.textContent = now.toLocaleDateString('pt-BR', options);
+            }
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString('pt-BR');
+            }
+            
+            setTimeout(updateDateTime, 1000);
+        }
+
+        // Update all data
+        function updateAllData() {
+            updateServiceCounters();
+            updateProcessesTable();
+            updateCharts();
+        }
+
+        // Update service counters
+        function updateServiceCounters() {
+            let activeProcesses = 0;
+            lawFirmData.monthlyRevenue = 0;
+            
+            // Reset counters
+            Object.keys(lawFirmData.serviceTypes).forEach(key => {
+                lawFirmData.serviceTypes[key].count = 0;
+            });
+            
+            // Calculate totals
+            lawFirmData.processes.forEach(process => {
+                if (lawFirmData.serviceTypes[process.service]) {
+                    lawFirmData.serviceTypes[process.service].count++;
+                    lawFirmData.monthlyRevenue += process.value;
+                    
+                    if (process.status === 'active') {
+                        activeProcesses++;
+                    }
+                }
+            });
+
+            // Update UI
+            const totalClients = document.getElementById('totalClients');
+            const activeServices = document.getElementById('activeServices');
+            const monthlyRevenue = document.getElementById('monthlyRevenue');
+            const revenueGoal = document.getElementById('revenueGoal');
+            const goalProgress = document.getElementById('goalProgress');
+            const processCount = document.getElementById('processCount');
+            
+            if (totalClients) totalClients.textContent = lawFirmData.processes.length;
+            if (activeServices) activeServices.textContent = activeProcesses;
+            if (monthlyRevenue) monthlyRevenue.textContent = formatCurrency(lawFirmData.monthlyRevenue);
+            if (revenueGoal) revenueGoal.textContent = formatCurrency(lawFirmData.revenueGoal);
+            
+            if (goalProgress) {
+                const progress = lawFirmData.revenueGoal > 0 ? 
+                    (lawFirmData.monthlyRevenue / lawFirmData.revenueGoal) * 100 : 0;
+                goalProgress.innerHTML = `<i class="fas fa-chart-line"></i><span>${Math.min(progress, 100).toFixed(1)}% alcançado</span>`;
+            }
+            
+            if (processCount) {
+                processCount.textContent = `${lawFirmData.processes.length} processos`;
+            }
+        }
+
+        // Update goal progress chart
+        function updateGoalProgressChart() {
+            const ctx = document.getElementById('goalProgressChart');
+            if (!ctx) return;
+            
+            const achieved = lawFirmData.monthlyRevenue;
+            const goal = lawFirmData.revenueGoal;
+            const remaining = Math.max(0, goal - achieved);
+            const percentage = goal > 0 ? Math.min((achieved / goal) * 100, 100) : 0;
+            
+            // Destroy previous chart
+            if (goalProgressChart) {
+                goalProgressChart.destroy();
+            }
+            
+            // Create new chart
+            goalProgressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Faturado', 'Falta'],
+                    datasets: [{
+                        data: [achieved, remaining],
+                        backgroundColor: ['#38b000', '#e9ecef'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            
+            // Update progress bar and stats
+            const progressBar = document.getElementById('progressBar');
+            const achievedValue = document.getElementById('achievedValue');
+            const remainingValue = document.getElementById('remainingValue');
+            const progressPercent = document.getElementById('progressPercent');
+            
+            if (progressBar) progressBar.style.width = `${percentage}%`;
+            if (achievedValue) achievedValue.textContent = formatCurrency(achieved);
+            if (remainingValue) remainingValue.textContent = formatCurrency(remaining);
+            if (progressPercent) progressPercent.textContent = `${percentage.toFixed(1)}%`;
+        }
+
+        // Update services chart
+        function updateServicesChart() {
+            const ctx = document.getElementById('servicesChart');
+            if (!ctx) return;
+            
+            const labels = [];
+            const data = [];
+            const backgroundColors = [];
+            
+            Object.keys(lawFirmData.serviceTypes).forEach(key => {
+                const service = lawFirmData.serviceTypes[key];
+                if (service.count > 0) {
+                    labels.push(service.name);
+                    data.push(service.count);
+                    backgroundColors.push(service.color);
+                }
+            });
+            
+            // Destroy previous chart
+            if (servicesChart) {
+                servicesChart.destroy();
+            }
+            
+            // Create new chart
+            servicesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            
+            updateChartLegend();
+        }
+
+        // Update chart legend
+        function updateChartLegend() {
+            const legendContainer = document.getElementById('chartLegend');
+            if (!legendContainer) return;
+            
+            legendContainer.innerHTML = '';
+            
+            Object.keys(lawFirmData.serviceTypes).forEach(key => {
+                const service = lawFirmData.serviceTypes[key];
+                if (service.count > 0) {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    legendItem.innerHTML = `
+                        <div class="legend-color" style="background-color: ${service.color}"></div>
+                        <span>${service.name}</span>
+                        <span style="font-weight: 600; margin-left: auto;">${service.count}</span>
+                    `;
+                    legendContainer.appendChild(legendItem);
+                }
+            });
+        }
+
+        // Update processes table
+        function updateProcessesTable() {
+            const tableBody = document.getElementById('clientsTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            lawFirmData.processes.forEach((process, index) => {
+                const row = document.createElement('tr');
+                const formattedDate = new Date(process.date).toLocaleDateString('pt-BR');
+                const statusLabel = lawFirmData.statusLabels[process.status] || 'Indefinido';
+                const statusClass = `status-${process.status}`;
+                
+                row.innerHTML = `
+                    <td><strong>${process.name}</strong></td>
+                    <td><code>${process.processNumber}</code></td>
+                    <td>${lawFirmData.serviceTypes[process.service]?.name || process.service}</td>
+                    <td><strong>${formatCurrency(process.value)}</strong></td>
+                    <td>${formattedDate}</td>
+                    <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editProcess(${index})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="deleteProcess(${index})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Update all charts
+        function updateCharts() {
+            updateGoalProgressChart();
+            updateServicesChart();
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return 'R$ ' + value.toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            console.log(`${type}: ${message}`);
+            alert(message);
+        }
+
+        // Add process
+        function addProcess() {
+            const clientName = document.getElementById('clientName');
+            const serviceType = document.getElementById('serviceType');
+            const serviceValue = document.getElementById('serviceValue');
+            const processNumber = document.getElementById('processNumber');
+            
+            if (!clientName || !serviceType || !serviceValue || !processNumber) return;
+            
+            const name = clientName.value.trim();
+            const type = serviceType.value;
+            const value = parseFloat(serviceValue.value);
+            const number = processNumber.value.trim();
+            
+            // Validation
+            if (!name) {
+                showNotification('Informe o nome do cliente.', 'error');
+                return;
+            }
+            
+            if (!type) {
+                showNotification('Selecione a área do direito.', 'error');
+                return;
+            }
+            
+            if (isNaN(value) || value <= 0) {
+                showNotification('Informe um valor válido.', 'error');
+                return;
+            }
+            
+            if (!number) {
+                showNotification('Informe o número do processo.', 'error');
+                return;
+            }
+            
+            // Create new process
+            const newProcess = {
+                id: lawFirmData.processes.length + 1,
+                name: name,
+                service: type,
+                value: value,
+                date: new Date().toISOString().split('T')[0],
+                status: 'active',
+                processNumber: number
+            };
+            
+            lawFirmData.processes.push(newProcess);
+            
+            // Clear form
+            clientName.value = '';
+            serviceType.value = '';
+            serviceValue.value = '';
+            processNumber.value = '';
+            
+            // Update UI
+            updateAllData();
+            showNotification('Processo adicionado com sucesso!', 'success');
+        }
+
+        // Edit process
+        function editProcess(index) {
+            const process = lawFirmData.processes[index];
+            showNotification(`Editar processo ${process.processNumber}? Use o botão de ajuste de meta para alterações globais.`, 'info');
+        }
+
+        // Delete process
+        function deleteProcess(index) {
+            if (confirm('Excluir este processo?')) {
+                lawFirmData.processes.splice(index, 1);
+                updateAllData();
+                showNotification('Processo excluído.', 'success');
+            }
+        }
+
+        // Add retroactive
+        function addRetroactive() {
+            showNotification('Funcionalidade de adição retroativa em desenvolvimento.', 'info');
+        }
+
+        // Adjust goal
+        function adjustGoal() {
+            const modal = document.getElementById('editModal');
+            const currentGoalDisplay = document.getElementById('currentGoalDisplay');
+            const newGoalValue = document.getElementById('newGoalValue');
+            
+            if (!modal || !currentGoalDisplay || !newGoalValue) return;
+            
+            currentGoalDisplay.value = formatCurrency(lawFirmData.revenueGoal);
+            newGoalValue.value = lawFirmData.revenueGoal;
+            modal.classList.add('active');
+            
+            // Setup event listeners
+            const saveBtn = document.getElementById('saveGoalBtn');
+            const cancelBtn = document.getElementById('cancelGoalBtn');
+            const closeBtn = document.getElementById('modalCloseBtn');
+            
+            if (saveBtn) {
+                saveBtn.onclick = function() {
+                    const newGoal = parseFloat(newGoalValue.value);
+                    if (!isNaN(newGoal) && newGoal > 0) {
+                        lawFirmData.revenueGoal = newGoal;
+                        updateAllData();
+                        modal.classList.remove('active');
+                        showNotification('Meta atualizada!', 'success');
+                    } else {
+                        showNotification('Informe um valor válido.', 'error');
+                    }
+                };
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.onclick = function() {
+                    modal.classList.remove('active');
+                };
+            }
+            
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    modal.classList.remove('active');
+                };
+            }
+        }
+
+        // Clear data
+        function clearData() {
+            if (confirm('Limpar todos os dados?')) {
+                lawFirmData.processes = [];
+                lawFirmData.monthlyRevenue = 0;
+                updateAllData();
+                showNotification('Dados limpos.', 'success');
+            }
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            // Initialize data
+            initializeData();
+            
+            // Setup event listeners
+            const addBtn = document.getElementById('addClientServiceBtn');
+            const retroBtn = document.getElementById('addRetroactiveBtn');
+            const editBtn = document.getElementById('editMetricsBtn');
+            const clearBtn = document.getElementById('clearDataBtn');
+            const modalOverlay = document.getElementById('editModal');
+            
+            if (addBtn) addBtn.addEventListener('click', addProcess);
+            if (retroBtn) retroBtn.addEventListener('click', addRetroactive);
+            if (editBtn) editBtn.addEventListener('click', adjustGoal);
+            if (clearBtn) clearBtn.addEventListener('click', clearData);
+            
+            // Close modal when clicking outside
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Enter key to add process
+            const serviceValueInput = document.getElementById('serviceValue');
+            if (serviceValueInput) {
+                serviceValueInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addProcess();
+                    }
+                });
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
